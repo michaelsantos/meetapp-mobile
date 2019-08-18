@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 
-import api from '~/services/api';
+// import api from '~/services/api';
 
 import Background from '~/components/Background';
+import Header from '~/components/Header';
+import DateChooser from '~/components/DateChooser';
 import Meetup from '~/components/Meetup';
 
 import { Container, MeetupsList } from './styles';
@@ -16,6 +18,8 @@ export default function Dashboard() {
 
   return (
     <Background>
+      <Header />
+      <DateChooser onChange={() => {}} />
       <Container>
         <MeetupsList
           data={data}

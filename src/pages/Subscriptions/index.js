@@ -1,23 +1,39 @@
 import React from 'react';
-import { Text } from 'react-native';
+import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import IconCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Background from '~/components/Background';
+import Header from '~/components/Header';
+import Meetup from '~/components/Meetup';
 
-// import { Container } from './styles';
+import { Container, MeetupsList } from './styles';
+
+const data = [1, 2, 3, 4];
 
 export default function Subscriptions() {
   return (
     <Background>
-      <Text>Subscriptions</Text>
+      <Header />
+      <Container>
+        <MeetupsList
+          data={data}
+          keyExtractor={item => String(item)}
+          renderItem={({ item }) => <Meetup data={item} />}
+        />
+      </Container>
     </Background>
   );
 }
 
+const tabBarIcon = ({ tintColor }) => (
+  <Icon name="local-offer" size={20} color={tintColor} />
+);
+
 Subscriptions.navigationOptions = {
   tabBarLabel: 'Inscrições',
-  tabBarIcon: ({ tintColor }) => (
-    <Icon name="local-offer" size={20} color={tintColor} />
-  ),
+  tabBarIcon,
+};
+
+tabBarIcon.propTypes = {
+  tintColor: PropTypes.string.isRequired,
 };

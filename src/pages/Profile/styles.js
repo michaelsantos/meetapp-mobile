@@ -10,12 +10,12 @@ export const Container = styled.SafeAreaView`
 export const Separator = styled.View`
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
-  margin: 20px 0 10px;
+  margin: 10px 0 10px;
 `;
 
 export const Form = styled.ScrollView.attrs({
   showsVerticalScrollIndicator: false,
-  contentContainerStyle: { padding: 20 },
+  contentContainerStyle: { padding: 20, paddingTop: 10 },
 })`
   align-self: stretch;
 `;

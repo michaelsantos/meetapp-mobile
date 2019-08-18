@@ -1,12 +1,8 @@
-import React from 'react';
-import { Image } from 'react-native';
 import {
   createAppContainer,
   createSwitchNavigator,
   createBottomTabNavigator,
 } from 'react-navigation';
-
-import logo from '~/assets/logo.png';
 
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
@@ -30,13 +26,6 @@ export default (isSigned = false) =>
             Profile,
           },
           {
-            headerLayoutPreset: 'center',
-            defaultNavigationOptions: {
-              headerTitle: <Image source={logo} />,
-              headerStyle: {
-                backgroundColor: '#fff',
-              },
-            },
             tabBarOptions: {
               keyboardHidesTabBar: true,
               activeTintColor: '#fff',

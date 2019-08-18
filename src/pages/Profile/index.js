@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Background from '~/components/Background';
+import Header from '~/components/Header';
 
 import { updateProfileRequest } from '~/store/modules/user/actions';
 import { signOut } from '~/store/modules/auth/actions';
@@ -20,6 +21,7 @@ import {
 export default function Profile() {
   const dispatch = useDispatch();
   const profile = useSelector(state => state.user.profile);
+  const loading = useSelector(state => state.auth.loading);
 
   const emailRef = useRef();
   const oldPasswordRef = useRef();
@@ -56,6 +58,7 @@ export default function Profile() {
 
   return (
     <Background>
+      <Header />
       <Container>
         <Form>
           <FormInput
@@ -112,7 +115,9 @@ export default function Profile() {
             onChangeText={setConfirmPassword}
           />
 
-          <SubmitButton onPress={handleSubmit}>Salvar perfil</SubmitButton>
+          <SubmitButton onPress={handleSubmit} loading={loading}>
+            Salvar perfil
+          </SubmitButton>
 
           <LogoutButton onPress={handleLogout}>Sair do Meetapp</LogoutButton>
         </Form>
