@@ -17,10 +17,11 @@ export function* updateProfile({ payload }) {
 
     const response = yield call(api.put, 'users', profile);
 
-    Alert.success('Sucesso!', 'Perfil atualizado com sucesso');
+    Alert.alert('Sucesso!', 'Perfil atualizado com sucesso');
 
     yield put(updateProfileSuccess(response.data));
   } catch (err) {
+    console.tron.error(err);
     const error = err.response;
 
     Alert.alert(
