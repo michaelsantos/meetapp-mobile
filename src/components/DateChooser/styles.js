@@ -4,7 +4,7 @@ export const Container = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin: 25px 0;
+  margin: 20px 0;
 `;
 
 export const GoNextButton = styled.TouchableOpacity`

@@ -43,10 +43,12 @@ export const DescriptionText = styled.Text`
 
 export const SubscribeButton = styled(Button)`
   margin-top: 5px;
-  background: #f94d6a;
+  background: ${props => (props.owner ? '#333' : ' #f94d6a')};
+  opacity: ${props => (props.enabled && !props.owner ? '1' : '0.5')};
 `;
 
 export const UnsubscribeButton = styled(Button)`
   margin-top: 5px;
   background: #d44059;
+  opacity: ${props => (props.enabled ? '1' : '0.5')};
 `;

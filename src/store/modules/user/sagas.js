@@ -21,11 +21,10 @@ export function* updateProfile({ payload }) {
 
     yield put(updateProfileSuccess(response.data));
   } catch (err) {
-    console.tron.error(err);
     const error = err.response;
 
     Alert.alert(
-      'Erro no login',
+      'Erro no perfil',
       !!error && error.data.error
         ? `Ops! ${error.data.error}`
         : 'Ocorreu um erro, tente novamente'

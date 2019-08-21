@@ -9,6 +9,7 @@ export const MeetupsList = styled.FlatList.attrs({
   contentContainerStyle: {
     flexGrow: 1,
     padding: 20,
+    paddingTop: 5,
   },
 })`
   flex: 1;
@@ -21,7 +22,7 @@ export const ListEmpty = styled.View`
 `;
 
 export const ListEmptyText = styled.Text`
-  color: #fff;
-  font-size: 24px;
-  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+  margin-top: 10px;
 `;
