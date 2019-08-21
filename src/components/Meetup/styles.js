@@ -9,7 +9,7 @@ export const Container = styled.View`
   margin-bottom: 20px;
 `;
 
-export const EventImage = styled.Image`
+export const MeetupImage = styled.Image`
   width: 100%;
   height: 150px;
   border-radius: 4px;
@@ -21,7 +21,7 @@ export const Wrapper = styled.View`
   padding: 20px;
 `;
 
-export const EventTitle = styled.Text`
+export const MeetupTitle = styled.Text`
   color: #333;
   font-size: 18px;
   font-weight: bold;
@@ -44,11 +44,11 @@ export const DescriptionText = styled.Text`
 export const SubscribeButton = styled(Button)`
   margin-top: 5px;
   background: ${props => (props.owner ? '#333' : ' #f94d6a')};
-  opacity: ${props => (props.enabled && !props.owner ? '1' : '0.5')};
+  opacity: ${props => (props.enabled ? '1' : '0.5')};
 `;
 
 export const UnsubscribeButton = styled(Button)`
   margin-top: 5px;
-  background: #d44059;
+  background: #f94d6a;
   opacity: ${props => (props.enabled ? '1' : '0.5')};
 `;

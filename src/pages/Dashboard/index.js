@@ -14,10 +14,11 @@ import Header from '~/components/Header';
 import DateChooser from '~/components/DateChooser';
 import Meetup from '~/components/Meetup';
 
-import { Container, MeetupsList, ListEmpty, ListEmptyText } from './styles';
+import { Container, MeetupList, ListEmpty, ListEmptyText } from './styles';
 
 function Dashboard({ isFocused }) {
   const [loading, setLoading] = useState(false);
+  const [loadingHandle, setLoadingHandle] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [meetups, setMeetups] = useState([]);
   const [date, setDate] = useState(new Date());
@@ -81,6 +82,8 @@ function Dashboard({ isFocused }) {
 
   async function handleSubscribe(id) {
     try {
+      setLoadingHandle(true);
+
       await api.post(`meetups/${id}/subscriptions`);
 
       setMeetups(
@@ -91,6 +94,8 @@ function Dashboard({ isFocused }) {
           return meetup;
         })
       );
+
+      Alert.alert('Meetup', 'Inscrição efetuada com sucesso!');
     } catch (err) {
       const error = err.response;
 
@@ -100,11 +105,42 @@ function Dashboard({ isFocused }) {
           ? `Ops! ${error.data.error}`
           : 'Ocorreu um erro, tente novamente'
       );
+    } finally {
+      setLoadingHandle(false);
+    }
+  }
+
+  async function handleUnsubscribe(id) {
+    try {
+      setLoadingHandle(true);
+
+      await api.delete(`meetups/${id}/subscriptions`);
+
+      setMeetups(
+        meetups.map(meetup => {
+          if (meetup.id === id) {
+            return { ...meetup, subscribed: false };
+          }
+          return meetup;
+        })
+      );
+
+      Alert.alert('Meetup', 'Cancelamento efetuado com sucesso!');
+    } catch (err) {
+      const error = err.response;
+
+      Alert.alert(
+        'Erro ao cancelar inscrição',
+        !!error && error.data.error
+          ? `Ops! ${error.data.error}`
+          : 'Ocorreu um erro, tente novamente'
+      );
+    } finally {
+      setLoadingHandle(false);
     }
   }
 
   function handleDateChange(selectedDate) {
-    console.tron.error('Alterado data');
     setDate(selectedDate);
   }
 
@@ -116,7 +152,7 @@ function Dashboard({ isFocused }) {
         {loading ? (
           <ActivityIndicator size="large" color="rgba(255, 255, 255, 0.5)" />
         ) : (
-          <MeetupsList
+          <MeetupList
             data={meetups}
             keyExtractor={item => String(item.id)}
             showsVerticalScrollIndicator={false}
@@ -137,8 +173,12 @@ function Dashboard({ isFocused }) {
             renderItem={({ item }) => (
               <Meetup
                 data={item}
-                onPress={() => {
+                loading={loadingHandle}
+                onSubscribe={() => {
                   handleSubscribe(item.id);
+                }}
+                onUnsubscribe={() => {
+                  handleUnsubscribe(item.id);
                 }}
               />
             )}
@@ -152,6 +192,10 @@ function Dashboard({ isFocused }) {
 const tabBarIcon = ({ tintColor }) => (
   <Icon name="format-list-bulleted" size={20} color={tintColor} />
 );
+
+Dashboard.propTypes = {
+  isFocused: PropTypes.bool.isRequired,
+};
 
 Dashboard.navigationOptions = {
   tabBarLabel: 'Meetups',
