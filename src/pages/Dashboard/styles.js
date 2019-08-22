@@ -10,6 +10,7 @@ export const MeetupList = styled.FlatList.attrs({
     flexGrow: 1,
     padding: 20,
     paddingTop: 10,
+    paddingBottom: 0,
   },
 })`
   flex: 1;

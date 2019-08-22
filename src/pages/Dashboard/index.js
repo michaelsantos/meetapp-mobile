@@ -158,15 +158,21 @@ function Dashboard({ isFocused }) {
       <Header />
       <DateChooser onChange={handleDateChange} />
       <Container>
-        {loading ? (
-          <ActivityIndicator size="large" color="rgba(255, 255, 255, 0.5)" />
-        ) : (
-          <MeetupList
-            data={meetups}
-            keyExtractor={item => String(item.id)}
-            onEndReachedThreshold={0.1}
-            onEndReached={() => loadMeetups()}
-            ListEmptyComponent={() => (
+        <MeetupList
+          data={meetups}
+          keyExtractor={item => String(item.id)}
+          onEndReachedThreshold={0.1}
+          onEndReached={() => loadMeetups()}
+          ListFooterComponent={
+            loading && (
+              <ActivityIndicator
+                size="large"
+                color="rgba(255, 255, 255, 0.5)"
+              />
+            )
+          }
+          ListEmptyComponent={() =>
+            !loading && (
               <ListEmpty>
                 <Icon
                   name="sentiment-dissatisfied"
@@ -175,21 +181,21 @@ function Dashboard({ isFocused }) {
                 />
                 <ListEmptyText>Nenhum evento para este dia</ListEmptyText>
               </ListEmpty>
-            )}
-            renderItem={({ item }) => (
-              <Meetup
-                data={item}
-                loading={loadingHandle}
-                onSubscribe={() => {
-                  handleSubscribe(item.id);
-                }}
-                onUnsubscribe={() => {
-                  handleUnsubscribe(item.id);
-                }}
-              />
-            )}
-          />
-        )}
+            )
+          }
+          renderItem={({ item }) => (
+            <Meetup
+              data={item}
+              loading={loadingHandle}
+              onSubscribe={() => {
+                handleSubscribe(item.id);
+              }}
+              onUnsubscribe={() => {
+                handleUnsubscribe(item.id);
+              }}
+            />
+          )}
+        />
       </Container>
     </Background>
   );

@@ -99,34 +99,38 @@ function Subscriptions({ isFocused }) {
     <Background>
       <Header />
       <Container>
-        {loading ? (
-          <ActivityIndicator size="large" color="rgba(255, 255, 255, 0.5)" />
-        ) : (
-          <MeetupList
-            data={meetups}
-            keyExtractor={item => String(item.id)}
-            showsVerticalScrollIndicator={false}
-            onRefresh={refreshList}
-            refreshing={refreshing}
-            // onEndReachedThreshold={0.1}
-            // onEndReached={() => loadMeetups()}
-            ListEmptyComponent={() => (
+        <MeetupList
+          data={meetups}
+          keyExtractor={item => String(item.id)}
+          showsVerticalScrollIndicator={false}
+          onRefresh={refreshList}
+          refreshing={refreshing}
+          ListFooterComponent={
+            loading && (
+              <ActivityIndicator
+                size="large"
+                color="rgba(255, 255, 255, 0.5)"
+              />
+            )
+          }
+          ListEmptyComponent={() =>
+            !loading && (
               <ListEmpty>
                 <Icon name="today" size={80} color="rgba(255, 255, 255, 0.5)" />
                 <ListEmptyText>Inscrito em nenhum evento próximo</ListEmptyText>
               </ListEmpty>
-            )}
-            renderItem={({ item }) => (
-              <Meetup
-                data={item}
-                loading={loadingHandle}
-                onUnsubscribe={() => {
-                  handleUnsubscribe(item.id);
-                }}
-              />
-            )}
-          />
-        )}
+            )
+          }
+          renderItem={({ item }) => (
+            <Meetup
+              data={item}
+              loading={loadingHandle}
+              onUnsubscribe={() => {
+                handleUnsubscribe(item.id);
+              }}
+            />
+          )}
+        />
       </Container>
     </Background>
   );
