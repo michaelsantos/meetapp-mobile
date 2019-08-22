@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { format, addDays } from 'date-fns';
+import { format, addDays, startOfDay } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -15,7 +15,7 @@ export default function DateChooser({ onChange }) {
   }, [date]);
 
   function handleSetDate(day) {
-    const newDate = addDays(date, day);
+    const newDate = startOfDay(addDays(date, day));
 
     setDate(newDate);
     onChange(newDate);

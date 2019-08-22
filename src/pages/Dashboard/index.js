@@ -19,7 +19,8 @@ import { Container, MeetupList, ListEmpty, ListEmptyText } from './styles';
 function Dashboard({ isFocused }) {
   const [loading, setLoading] = useState(false);
   const [loadingHandle, setLoadingHandle] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [endList, setEndList] = useState(false);
   const [meetups, setMeetups] = useState([]);
   const [date, setDate] = useState(new Date());
 
@@ -27,14 +28,14 @@ function Dashboard({ isFocused }) {
 
   async function loadMeetups() {
     try {
-      if (loading) return;
+      if (loading || endList) return;
 
       setLoading(true);
 
       const response = await api.get('meetups', {
         params: {
           date,
-          page: 1,
+          page,
         },
       });
 
@@ -53,8 +54,17 @@ function Dashboard({ isFocused }) {
         ),
       }));
 
+      const totalItems = await response.headers['x-total-count'];
+      const totalPages = Math.floor(totalItems / 2);
+
       setLoading(false);
-      setMeetups(data);
+      if (page === totalPages) {
+        setEndList(true);
+      } else {
+        setEndList(false);
+      }
+      setMeetups([...meetups, ...data]);
+      setPage(page + 1);
     } catch (err) {
       const error = err.response;
 
@@ -67,12 +77,10 @@ function Dashboard({ isFocused }) {
     }
   }
 
-  async function refreshList() {
-    setRefreshing(true);
-
-    await loadMeetups();
-
-    setRefreshing(false);
+  function resetPage() {
+    setMeetups([]);
+    setEndList(false);
+    setPage(1);
   }
 
   useEffect(() => {
@@ -141,6 +149,7 @@ function Dashboard({ isFocused }) {
   }
 
   function handleDateChange(selectedDate) {
+    resetPage();
     setDate(selectedDate);
   }
 
@@ -155,11 +164,8 @@ function Dashboard({ isFocused }) {
           <MeetupList
             data={meetups}
             keyExtractor={item => String(item.id)}
-            showsVerticalScrollIndicator={false}
-            onRefresh={refreshList}
-            refreshing={refreshing}
-            // onEndReachedThreshold={0.1}
-            // onEndReached={() => loadMeetups()}
+            onEndReachedThreshold={0.1}
+            onEndReached={() => loadMeetups()}
             ListEmptyComponent={() => (
               <ListEmpty>
                 <Icon
