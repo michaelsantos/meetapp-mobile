@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { withNavigationFocus } from 'react-navigation';
 import { Alert, ActivityIndicator } from 'react-native';
 import { format, parseISO } from 'date-fns';
 import pt from 'date-fns/locale/pt';
@@ -10,18 +10,15 @@ import api from '~/services/api';
 
 import Background from '~/components/Background';
 import Header from '~/components/Header';
-import DateChooser from '~/components/DateChooser';
 import Meetup from '~/components/Meetup';
 
-import { Container, MeetupsList, ListEmpty, ListEmptyText } from './styles';
+import { Container, MeetupList, ListEmpty, ListEmptyText } from './styles';
 
-export default function Subscriptions() {
+function Subscriptions({ isFocused }) {
   const [loading, setLoading] = useState(false);
+  const [loadingHandle, setLoadingHandle] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [meetups, setMeetups] = useState([]);
-  const [date, setDate] = useState(new Date());
-
-  const user = useSelector(state => state.user.profile);
 
   async function loadMeetups() {
     try {
@@ -29,21 +26,14 @@ export default function Subscriptions() {
 
       setLoading(true);
 
-      const response = await api.get('meetups', {
-        params: {
-          date,
-          page: 1,
-        },
-      });
+      const response = await api.get('subscriptions');
 
-      const data = response.data.map(meetup => ({
-        ...meetup,
-        subscribed: !!meetup.subscription.find(
-          subscription => subscription.user_id === user.id
-        ),
-        owner: user.id === meetup.user_id,
+      const data = response.data.map(subscriptions => ({
+        ...subscriptions.meetup,
+        subscribed: true,
+        owner: false,
         formattedDate: format(
-          parseISO(meetup.date),
+          parseISO(subscriptions.meetup.date),
           "dd 'de' MMMM', às' H'h'",
           {
             locale: pt,
@@ -76,46 +66,43 @@ export default function Subscriptions() {
   useEffect(() => {
     loadMeetups();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date]);
+  }, [isFocused]);
 
-  async function handleSubscribe(id) {
+  async function handleUnsubscribe(id) {
     try {
-      await api.post(`meetups/${id}/subscriptions`);
+      setLoadingHandle(true);
+
+      await api.delete(`meetups/${id}/subscriptions`);
 
       setMeetups(
-        meetups.map(meetup => {
-          if (meetup.id === id) {
-            return { ...meetup, subscribed: true };
-          }
-          return meetup;
+        meetups.filter(meetup => {
+          return meetup.id !== id;
         })
       );
+
+      Alert.alert('Meetup', 'Cancelamento efetuado com sucesso!');
     } catch (err) {
       const error = err.response;
 
       Alert.alert(
-        'Erro ao se inscrever',
+        'Erro ao cancelar inscrição',
         !!error && error.data.error
           ? `Ops! ${error.data.error}`
           : 'Ocorreu um erro, tente novamente'
       );
+    } finally {
+      setLoadingHandle(false);
     }
-  }
-
-  function handleDateChange(selectedDate) {
-    console.tron.error('Alterado data');
-    setDate(selectedDate);
   }
 
   return (
     <Background>
       <Header />
-      <DateChooser onChange={handleDateChange} />
       <Container>
         {loading ? (
           <ActivityIndicator size="large" color="rgba(255, 255, 255, 0.5)" />
         ) : (
-          <MeetupsList
+          <MeetupList
             data={meetups}
             keyExtractor={item => String(item.id)}
             showsVerticalScrollIndicator={false}
@@ -125,19 +112,16 @@ export default function Subscriptions() {
             // onEndReached={() => loadMeetups()}
             ListEmptyComponent={() => (
               <ListEmpty>
-                <Icon
-                  name="sentiment-dissatisfied"
-                  size={80}
-                  color="rgba(255, 255, 255, 0.5)"
-                />
-                <ListEmptyText>Nenhum evento para este dia</ListEmptyText>
+                <Icon name="today" size={80} color="rgba(255, 255, 255, 0.5)" />
+                <ListEmptyText>Inscrito em nenhum evento próximo</ListEmptyText>
               </ListEmpty>
             )}
             renderItem={({ item }) => (
               <Meetup
                 data={item}
-                onPress={() => {
-                  handleSubscribe(item.id);
+                loading={loadingHandle}
+                onUnsubscribe={() => {
+                  handleUnsubscribe(item.id);
                 }}
               />
             )}
@@ -152,6 +136,10 @@ const tabBarIcon = ({ tintColor }) => (
   <Icon name="local-offer" size={20} color={tintColor} />
 );
 
+Subscriptions.propTypes = {
+  isFocused: PropTypes.bool.isRequired,
+};
+
 Subscriptions.navigationOptions = {
   tabBarLabel: 'Inscrições',
   tabBarIcon,
@@ -160,3 +148,5 @@ Subscriptions.navigationOptions = {
 tabBarIcon.propTypes = {
   tintColor: PropTypes.string.isRequired,
 };
+
+export default withNavigationFocus(Subscriptions);

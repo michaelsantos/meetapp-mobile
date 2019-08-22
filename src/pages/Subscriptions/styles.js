@@ -4,12 +4,11 @@ export const Container = styled.SafeAreaView`
   flex: 1;
 `;
 
-export const MeetupsList = styled.FlatList.attrs({
+export const MeetupList = styled.FlatList.attrs({
   showsVerticalScrollIndicator: false,
   contentContainerStyle: {
     flexGrow: 1,
     padding: 20,
-    paddingTop: 5,
   },
 })`
   flex: 1;
