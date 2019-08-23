@@ -58,7 +58,7 @@ function Dashboard({ isFocused }) {
       const totalPages = Math.floor(totalItems / 2);
 
       setLoading(false);
-      if (page === totalPages) {
+      if (page === totalPages || totalItems < 2) {
         setEndList(true);
       } else {
         setEndList(false);
@@ -75,12 +75,6 @@ function Dashboard({ isFocused }) {
           : 'Ocorreu um erro, tente novamente'
       );
     }
-  }
-
-  function resetPage() {
-    setMeetups([]);
-    setEndList(false);
-    setPage(1);
   }
 
   useEffect(() => {
@@ -149,7 +143,9 @@ function Dashboard({ isFocused }) {
   }
 
   function handleDateChange(selectedDate) {
-    resetPage();
+    setMeetups([]);
+    setEndList(false);
+    setPage(1);
     setDate(selectedDate);
   }
 
