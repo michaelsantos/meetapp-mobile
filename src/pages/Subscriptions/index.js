@@ -64,7 +64,9 @@ function Subscriptions({ isFocused }) {
   }
 
   useEffect(() => {
-    loadMeetups();
+    if (isFocused) {
+      loadMeetups();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 

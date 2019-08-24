@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Container, GoBackButton, GoNextButton, DateText } from './styles';
 
 export default function DateChooser({ onChange }) {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(startOfDay(new Date()));
   const [formattedDate, setFormattedDate] = useState('');
 
   useMemo(() => {

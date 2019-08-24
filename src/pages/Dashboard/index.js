@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import { Alert, ActivityIndicator } from 'react-native';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, startOfDay } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
@@ -22,20 +22,22 @@ function Dashboard({ isFocused }) {
   const [page, setPage] = useState(1);
   const [endList, setEndList] = useState(false);
   const [meetups, setMeetups] = useState([]);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(startOfDay(new Date()));
 
   const user = useSelector(state => state.user.profile);
 
-  async function loadMeetups() {
+  async function loadMeetups(refresh = false) {
     try {
-      if (loading || endList) return;
+      if ((loading || endList) && !refresh) return;
 
       setLoading(true);
+
+      const currentPage = refresh ? 1 : page;
 
       const response = await api.get('meetups', {
         params: {
           date,
-          page,
+          page: currentPage,
         },
       });
 
@@ -55,16 +57,16 @@ function Dashboard({ isFocused }) {
       }));
 
       const totalItems = await response.headers['x-total-count'];
-      const totalPages = Math.floor(totalItems / 2);
+      const totalPages = Math.ceil(totalItems / 10);
 
       setLoading(false);
-      if (page === totalPages || totalItems < 2) {
+      if (currentPage === totalPages) {
         setEndList(true);
       } else {
         setEndList(false);
       }
-      setMeetups([...meetups, ...data]);
-      setPage(page + 1);
+      setMeetups(refresh ? data : [...meetups, ...data]);
+      setPage(currentPage + 1);
     } catch (err) {
       const error = err.response;
 
@@ -77,10 +79,29 @@ function Dashboard({ isFocused }) {
     }
   }
 
+  function resetPage() {
+    setMeetups([]);
+    setEndList(false);
+    setPage(1);
+  }
+
+  function handleDateChange(selectedDate) {
+    resetPage();
+    setDate(selectedDate);
+  }
+
   useEffect(() => {
     loadMeetups();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, isFocused]);
+  }, [date]);
+
+  useEffect(() => {
+    if (isFocused) {
+      resetPage();
+      loadMeetups(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   async function handleSubscribe(id) {
     try {
@@ -140,13 +161,6 @@ function Dashboard({ isFocused }) {
     } finally {
       setLoadingHandle(false);
     }
-  }
-
-  function handleDateChange(selectedDate) {
-    setMeetups([]);
-    setEndList(false);
-    setPage(1);
-    setDate(selectedDate);
   }
 
   return (
